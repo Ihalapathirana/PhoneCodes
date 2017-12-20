@@ -30,15 +30,18 @@
         </android.support.v7.widget.Toolbar>
 
         <ImageView
-            android:layout_width="match_parent"
+            android:layout_width="132dp"
             android:layout_height="132dp"
-            android:background="@drawable/wingfi" />
+            android:layout_gravity="center"
+            android:adjustViewBounds="false"
+            android:background="@drawable/phoneimage" />
 
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            >
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem"

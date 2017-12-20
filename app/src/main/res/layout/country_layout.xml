@@ -12,7 +12,7 @@
         android:layout_marginLeft="32dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="30dp"
-        android:hint="Enter country name or code" />
+        android:hint="Country name or code" />
 
     <Button
         android:id="@+id/button"
@@ -23,6 +23,7 @@
         android:layout_alignTop="@+id/autoCompleteTextView"
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
+        android:paddingLeft="5dp"
         android:text="Search"
         android:textColor="#ffffff"
         android:background="@drawable/round_corner_button"
