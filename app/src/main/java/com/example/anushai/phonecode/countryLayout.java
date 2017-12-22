@@ -24,6 +24,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.anushai.phonecode.model.Country;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +51,7 @@ public class countryLayout extends Fragment implements AsyncResponse {
     JSONArray jsonArray;
     String[] countryAutoCompletelistName;
     ArrayList<String> autoCompleteArray = new ArrayList<>();
+    AdView mAdView;
 
 
     @Nullable
@@ -73,6 +78,14 @@ public class countryLayout extends Fragment implements AsyncResponse {
         webService.asyncResponse=this;
 
         webService.execute("http://192.168.8.102:3000/AllCountry");
+
+
+        MobileAds.initialize(countryView.getContext(),
+                "ca-app-pub-3940256099942544~3347511713");
+
+        mAdView = countryView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         return countryView;
     }

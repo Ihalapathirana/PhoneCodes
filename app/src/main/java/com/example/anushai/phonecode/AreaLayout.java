@@ -21,6 +21,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +46,7 @@ public class AreaLayout extends Fragment implements AsyncResponse {
     AutoCompleteTextView autoCompleteTextView;
     Button button;
     View areaView;
+    AdView mAdView;
 
     String[] areaAutoCompletelistName;
     ArrayList<String> autoCompleteArray = new ArrayList<>();
@@ -74,6 +79,12 @@ public class AreaLayout extends Fragment implements AsyncResponse {
 
         webService.execute("http://192.168.8.102:3000/AllArea/getAreaName");
 
+        MobileAds.initialize(areaView.getContext(),
+                "ca-app-pub-3940256099942544~3347511713");
+
+        mAdView = areaView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         return areaView;
     }

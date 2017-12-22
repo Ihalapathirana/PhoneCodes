@@ -12,6 +12,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,6 +39,7 @@ public class SearchResult extends AppCompatActivity implements AsyncResponse {
     String tabtype;
     JSONArray jsonArray;
     JSONObject jsonObject;
+    AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,13 @@ public class SearchResult extends AppCompatActivity implements AsyncResponse {
             }
         }
 
+        MobileAds.initialize(this,
+                "ca-app-pub-3940256099942544~3347511713");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
 
     }
 
@@ -161,6 +173,7 @@ public class SearchResult extends AppCompatActivity implements AsyncResponse {
                     Toast.makeText(this, "Multiple results ", Toast.LENGTH_SHORT).show();
 
                 }
+
             }if(tabtype.equals("areaTab")){
 
                 for (int i = 0; i < jsonArray.length(); i++) {
