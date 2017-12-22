@@ -45,7 +45,8 @@ public class ListItemAdapter extends BaseAdapter {
         nameTextView.setText(listItems.get(i).getName());
         codeTextView.setText(listItems.get(i).getCode());
 
-        v.setTag(listItems.get(i).getId());
+        v.setTag(listItems.get(i).getName());
+
         return v;
     }
 }
