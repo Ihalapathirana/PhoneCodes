@@ -77,7 +77,8 @@ public class AreaLayout extends Fragment implements AsyncResponse {
         WebService webService=new WebService(areaView.getContext(),"get","Please wait");
         webService.asyncResponse=this;
 
-        webService.execute("http://192.168.8.102:3000/AllArea/getAreaName");
+        //webService.execute("http://104.196.101.2:3009/AllArea/getAreaName");
+        webService.execute("http://35.227.78.254:3009/AllArea/getAreaName");
 
         MobileAds.initialize(areaView.getContext(),
                 "ca-app-pub-3940256099942544~3347511713");
@@ -97,6 +98,7 @@ public class AreaLayout extends Fragment implements AsyncResponse {
     @Override
     public void processFinish(String output) {
         ArrayList<ListItem> arrayList=new ArrayList<>();
+        button = areaView.findViewById(R.id.button);
 
         try {
 
@@ -121,14 +123,13 @@ public class AreaLayout extends Fragment implements AsyncResponse {
             autoCompleteTextView.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
             //button
-            button = areaView.findViewById(R.id.button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
                     if(!autoCompleteTextView.getText().toString().equals("")
                             && (autoCompleteArray.contains(autoCompleteTextView.getText().toString()))) {
-                        Toast.makeText(areaView.getContext(), "clicked on " + autoCompleteTextView.getText(), Toast.LENGTH_SHORT).show();
+
                         Bundle simple_bundle = new Bundle();
                         simple_bundle.putString("item1", String.valueOf(autoCompleteTextView.getText()));
                         simple_bundle.putString("item2", "areaTab");
@@ -160,12 +161,20 @@ public class AreaLayout extends Fragment implements AsyncResponse {
                     intent.putExtras(simple_bundle);
                     startActivity(intent);
 
-                    Toast.makeText(areaView.getContext(),"clicked on "+ view.getTag(), Toast.LENGTH_SHORT).show();
                 }
             });
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            AlertError();
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                        Toast.makeText(areaView.getContext(), "Error occurred. Please try again later", Toast.LENGTH_SHORT).show();
+
+
+                }
+            });
         }
 
     }
@@ -206,5 +215,21 @@ public class AreaLayout extends Fragment implements AsyncResponse {
         alertDialog.show();
     }
 
+    public void AlertError(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(areaView.getContext());
+        alertDialogBuilder.setMessage("Error occurred. Please try again later");
+        alertDialogBuilder.setNegativeButton("Ok",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
 }

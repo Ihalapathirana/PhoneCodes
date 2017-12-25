@@ -29,6 +29,7 @@ public class WebService extends AsyncTask<String, Void, String> {
     public WebService(){
 
     }
+
     public WebService(String type,String m){
         message=m;
         request_type=type;

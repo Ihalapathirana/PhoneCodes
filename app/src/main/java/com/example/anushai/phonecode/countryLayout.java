@@ -1,5 +1,7 @@
 package com.example.anushai.phonecode;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,12 +10,14 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,6 +40,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by anushai on 12/20/17.
  */
@@ -52,6 +57,9 @@ public class countryLayout extends Fragment implements AsyncResponse {
     String[] countryAutoCompletelistName;
     ArrayList<String> autoCompleteArray = new ArrayList<>();
     AdView mAdView;
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+
 
 
     @Nullable
@@ -72,12 +80,32 @@ public class countryLayout extends Fragment implements AsyncResponse {
 
         if(!isNetworkAvailable()) {
             AlertBox();
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //Do something after 100ms
+                    if(isNetworkAvailable()) {
+                        callWebService();
+                    }
+                    else{
+                        Toast.makeText(countryView.getContext(), "Please try again later", Toast.LENGTH_SHORT).show();
+
+                    }
+                    alertDialog.dismiss();
+
+                }
+            }, 10000);
+
         }
 
         WebService webService=new WebService(countryView.getContext(),"get","Please wait");
         webService.asyncResponse=this;
 
-        webService.execute("http://192.168.8.102:3000/AllCountry");
+        //webService.execute("http://104.196.101.2:3009/");
+        webService.execute("http://35.227.78.254:3009/");
+
 
 
         MobileAds.initialize(countryView.getContext(),
@@ -87,7 +115,17 @@ public class countryLayout extends Fragment implements AsyncResponse {
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
+
         return countryView;
+    }
+
+
+
+    private void callWebService(){
+        WebService webService=new WebService(countryView.getContext(),"get","Please wait");
+        webService.asyncResponse=this;
+        //webService.execute("http://104.196.101.2:3009/");
+        webService.execute("http://35.227.78.254:3009/");
     }
     // make a call
     private void dialContactPhone(final String phoneNumber) {
@@ -98,6 +136,7 @@ public class countryLayout extends Fragment implements AsyncResponse {
     public void processFinish(String output) {
 
         ArrayList<ListItem> arrayList=new ArrayList<>();
+        button = countryView.findViewById(R.id.button);
 
         try {
 
@@ -121,13 +160,13 @@ public class countryLayout extends Fragment implements AsyncResponse {
             autoCompleteTextView.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
             //button
-            button = countryView.findViewById(R.id.button);
+
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(!autoCompleteTextView.getText().toString().equals("")
                             && (autoCompleteArray.contains(autoCompleteTextView.getText().toString()))) {
-                        Toast.makeText(countryView.getContext(), "clicked on " + autoCompleteTextView.getText(), Toast.LENGTH_SHORT).show();
+
                         Bundle simple_bundle = new Bundle();
                         simple_bundle.putString("item1", String.valueOf(autoCompleteTextView.getText()));
                         simple_bundle.putString("item2", "countryTab");
@@ -136,6 +175,7 @@ public class countryLayout extends Fragment implements AsyncResponse {
                         intent.putExtras(simple_bundle);
                         startActivity(intent);
                     }else{
+
                         Toast.makeText(countryView.getContext(), "Please enter valid name or code ", Toast.LENGTH_SHORT).show();
 
                     }
@@ -146,6 +186,7 @@ public class countryLayout extends Fragment implements AsyncResponse {
             listView = (ListView) countryView.findViewById(R.id.listView);
 
             listItemAdapter = new ListItemAdapter(countryView.getContext(), arrayList);
+
             listView.setAdapter(listItemAdapter);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -160,12 +201,23 @@ public class countryLayout extends Fragment implements AsyncResponse {
                     intent.putExtras(simple_bundle);
                     startActivity(intent);
 
-                    Toast.makeText(countryView.getContext(),"clicked on "+ view.getTag(), Toast.LENGTH_SHORT).show();
                 }
             });
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            if (isNetworkAvailable()) {
+
+                AlertError();
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Toast.makeText(countryView.getContext(), "Error occurred. Please try again later", Toast.LENGTH_SHORT).show();
+
+
+                    }
+                });
+            }
         }
 
     }
@@ -180,7 +232,7 @@ public class countryLayout extends Fragment implements AsyncResponse {
 
     //display alert when network is not available
     public void AlertBox(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(countryView.getContext());
+        alertDialogBuilder = new AlertDialog.Builder(countryView.getContext());
         alertDialogBuilder.setMessage("Internet not available, Please check your internet connectivity and try again");
         alertDialogBuilder.setPositiveButton("Cancel",
                 new DialogInterface.OnClickListener() {
@@ -198,11 +250,28 @@ public class countryLayout extends Fragment implements AsyncResponse {
                         Intent intent=new Intent(Settings.ACTION_WIFI_SETTINGS);
                         startActivity(intent);
 
+
                     }
                 });
 
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
+    public void AlertError(){
+        alertDialogBuilder = new AlertDialog.Builder(countryView.getContext());
+        alertDialogBuilder.setMessage("Error occurred. Please try again later");
+        alertDialogBuilder.setNegativeButton("Ok",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+
+                    }
+                });
+
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 }

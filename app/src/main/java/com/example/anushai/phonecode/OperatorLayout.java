@@ -71,7 +71,8 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
         WebService webService=new WebService(operatorView.getContext(),"get","Please wait");
         webService.asyncResponse=this;
 
-        webService.execute("http://192.168.8.102:3000/AllOperators/getOperatorName");
+        //webService.execute("http://104.196.101.2:3009/AllOperators/getOperatorName");
+        webService.execute("http://35.227.78.254:3009/AllOperators/getOperatorName");
 
         MobileAds.initialize(operatorView.getContext(),
                 "ca-app-pub-3940256099942544~3347511713");
@@ -91,6 +92,7 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
     @Override
     public void processFinish(String output) {
         ArrayList<ListItem> arrayList=new ArrayList<>();
+        button = operatorView.findViewById(R.id.button);
 
         try {
 
@@ -98,15 +100,16 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = (JSONObject) jsonArray.get(i);
-                arrayList.add(new ListItem(jsonObject.getString("operatorName"),
-                        jsonObject.getString("mobileCode"), jsonObject.getInt("id")));
+                if(!jsonObject.getString("operatorName").equals("null")) {
+                    arrayList.add(new ListItem(jsonObject.getString("operatorName"),
+                            jsonObject.getString("mobileCode"), jsonObject.getInt("id")));
 
 
-
-                if((autoCompleteArray.isEmpty()) || (!autoCompleteArray.contains(jsonObject.getString("operatorName")))) {
-                    autoCompleteArray.add(jsonObject.getString("operatorName"));
+                    if ((autoCompleteArray.isEmpty()) || (!autoCompleteArray.contains(jsonObject.getString("operatorName")))) {
+                        autoCompleteArray.add(jsonObject.getString("operatorName"));
+                    }
+                    autoCompleteArray.add(jsonObject.getString("mobileCode"));
                 }
-                autoCompleteArray.add( jsonObject.getString("mobileCode"));
             }
 
 
@@ -119,13 +122,13 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
             autoCompleteTextView.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
             //button
-            button = operatorView.findViewById(R.id.button);
+
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(!autoCompleteTextView.getText().toString().equals("")
                            && (autoCompleteArray.contains(autoCompleteTextView.getText().toString()))) {
-                        Toast.makeText(operatorView.getContext(), "clicked on " + autoCompleteTextView.getText(), Toast.LENGTH_SHORT).show();
+
                         Bundle simple_bundle = new Bundle();
                         simple_bundle.putString("item1", String.valueOf(autoCompleteTextView.getText()));
                         simple_bundle.putString("item2", "operatorTab");
@@ -156,12 +159,21 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
                     intent.putExtras(simple_bundle);
                     startActivity(intent);
 
-                    Toast.makeText(operatorView.getContext(),"clicked on "+ view.getTag(), Toast.LENGTH_SHORT).show();
                 }
             });
 
         } catch (JSONException e) {
-            e.printStackTrace();
+
+            AlertError();
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Toast.makeText(operatorView.getContext(), "Error occurred. Please try again later", Toast.LENGTH_SHORT).show();
+
+
+                }
+            });
         }
 
     }
@@ -200,5 +212,23 @@ public class OperatorLayout extends Fragment implements AsyncResponse{
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
+    public void AlertError(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(operatorView.getContext());
+        alertDialogBuilder.setMessage("Error occurred. Please try again later");
+        alertDialogBuilder.setNegativeButton("Ok",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
 
 }
